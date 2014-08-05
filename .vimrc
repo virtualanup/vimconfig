@@ -14,6 +14,8 @@ call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
 
 Plugin 'altercation/vim-colors-solarized'
+Plugin 'kien/ctrlp.vim'
+
 
 call vundle#end()            " required
 
@@ -25,6 +27,10 @@ set background=dark
 colorscheme solarized
 set guifont=Monaco\ 11
 
-set guioptions-=T           " Remove the toolbar
+:set guioptions-=m  "remove menu bar
+:set guioptions-=T  "remove toolbar
+:set guioptions-=r  "remove right-hand scroll bar
+:set guioptions-=L  "remove left-hand scroll bar
+
 set lines=40                " 40 lines of text instead of 24
 set number
