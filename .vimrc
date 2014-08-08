@@ -132,9 +132,9 @@ nnoremap <silent><A-k> :set paste<CR>m`O<Esc>``:set nopaste<CR>
 
 cabbrev so SessionOpen
 cabbrev ss SessionSave
+cabbrev R !python3 %
 
-
-
+cabbrev sudo w !sudo tee % " :sudo will save the file with administrative permission
 
 
 "AirLine Configuration
