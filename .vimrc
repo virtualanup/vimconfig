@@ -1,8 +1,10 @@
 " Vim Configuration file of virtualanup
 " http://virtualanup.com
 
+" General Configuraitons
 set nocompatible
-filetype off
+
+filetype indent on
 
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
@@ -12,8 +14,12 @@ call vundle#begin()
 
 " let Vundle manage Vundle, required
 Plugin 'gmarik/Vundle.vim'
-Plugin 'altercation/vim-colors-solarized'
+
+" File management
 Plugin 'kien/ctrlp.vim'
+
+
+
 Plugin 'bling/vim-airline'
 Plugin 'scrooloose/nerdtree'
 Plugin 'tpope/vim-repeat'
@@ -21,26 +27,50 @@ Plugin 'groenewege/vim-less'
 Plugin 'vim-coffee-script'
 Plugin 'godlygeek/tabular'
 Plugin 'plasticboy/vim-markdown'
-Plugin 'terryma/vim-multiple-cursors'
-"Plugin 'Valloric/YouCompleteMe'
+Plugin 'orthecreedence/void.vim'
+
+Plugin 'tpope/vim-sensible'
+Plugin 'easymotion/vim-easymotion'
+Plugin 'scrooloose/nerdcommenter'
+Plugin 'scrooloose/syntastic'
+
+"Plugin 'klen/python-mode'
+
+Plugin 'michaeljsmith/vim-indent-object'
+Plugin 'justinmk/vim-gtfo'
+Plugin 'lilydjwg/colorizer'
+Plugin 'Yggdroot/indentLine'
+Plugin 'ntpeters/vim-better-whitespace'
 Plugin 'vim-scripts/AutoClose'
 Plugin 'bling/vim-bufferline'
 Plugin 'vim-scripts/sessionman.vim'
 Plugin 'Shougo/neocomplete.vim'
 Plugin 'tpope/vim-fugitive'
+Plugin 'terryma/vim-expand-region'
+Plugin 'davidhalter/jedi-vim'
+Plugin 'tpope/vim-surround'
 
+
+" Color Schemes
+Plugin 'darkburn'
 
 call vundle#end()            " required
 
 
 
-
-
 "Display Configuration
+
+" Disable Mouse
+set mouse=a
+set mousehide
+
+
 set guiheadroom=0
 set background=dark
-colorscheme solarized
-set guifont=Liberation\ Mono\ for\ Powerline\ 11
+colorscheme void
+set t_Co=256
+set guifont=Liberation\ Mono\ for\ Powerline\ 12
+
 set linespace=0                 " No extra spaces between rows
 
 :set guioptions-=m  "remove menu bar
@@ -51,7 +81,6 @@ set linespace=0                 " No extra spaces between rows
 set lines=40                " 40 lines of text instead of 24
 set number
 
-set cursorline                  " Highlight current line
 set backspace=indent,eol,start  " Backspace for dummies
 set nu                          " Line numbers on
 set showmatch                   " Show matching brackets/parenthesis
@@ -66,8 +95,8 @@ set whichwrap=b,s,h,l,<,>,[,]   " Backspace and cursor keys wrap too
 set foldenable                  " Auto fold code
 set list
 set listchars=tab:›\ ,trail:•,extends:#,nbsp:. " Highlight problematic whitespace
-"set tabpagemax=15               " Only show 15 tabs
-"set showmode                    " Display the current mode
+set tabpagemax=15               " Only show 15 tabs
+set showmode                    " Display the current mode
 set scrolloff=1                 " Minimum lines to keep above and below cursor
 
 if has('cmdline_info')
@@ -99,15 +128,21 @@ set splitright                  " Puts new vsplit windows to the right of the cu
 set splitbelow                  " Puts new split windows to the bottom of the current
 set pastetoggle=<F12>           " pastetoggle (sane indentation on pastes)
 "set matchpairs+=<:>            " Match, to be used with %
+au FileType py set textwidth=79 " PEP-8 Friendly
 
-
+autocmd BufEnter * silent! lcd %:p:h
 
 "General Configuration
 set clipboard=unnamed
 syntax enable
-
+set history=1000                    " Store a ton of history (default is 20)
+set hidden                          " Allow buffer switching without saving
+set iskeyword-=.                    " '.' is an end of word designator
+set iskeyword-=#                    " '#' is an end of word designator
+set iskeyword-=-                    " '-' is an end of word designator
 
 " KEY REMAPPING
+let mapleader = ','
 " Remap ` to ' "
 nnoremap ' `
 nnoremap ` '
@@ -116,25 +151,73 @@ nnoremap ` '
 imap jk <Esc>
 
 " Easier moving from tabs and windows
-map <C-J> <C-W>j<C-W>
-map <C-K> <C-W>k<C-W>
-map <C-L> <C-W>l<C-W>
-map <C-H> <C-W>h<C-W>
+nnoremap <C-J> <C-W><C-J>
+nnoremap <C-K> <C-W><C-K>
+nnoremap <C-L> <C-W><C-L>
+nnoremap <C-H> <C-W><C-H>
 
 
-nnoremap <silent><C-j> m`:silent +g/\m^\s*$/d<CR>``:noh<CR>
-nnoremap <silent><C-k> m`:silent -g/\m^\s*$/d<CR>``:noh<CR>
+" Wrapped lines goes down/up to next row, rather than next line in file.
+noremap j gj
+noremap k gk
+" Yank from the cursor to the end of the line, to be consistent with C and D.
+nnoremap Y y$
+nmap <silent> <leader>/ :nohlsearch<CR>
+
+" Find merge conflict markers
+map <leader>fc /\v^[<\|=>]{7}( .*\|$)<CR>
+" Visual shifting (does not exit Visual mode)
+vnoremap < <gv
+vnoremap > >gv
+vnoremap . :normal .<CR>
+
+cabbrev so SessionOpen
+cabbrev ss SessionSave
+cabbrev R !python3 %
+
+" For when you forget to sudo.. Really Write the file.
+cmap w!! w !sudo tee % >/dev/null
+
+" Some helpers to edit mode
+" http://vimcasts.org/e/14
+cnoremap %% <C-R>=fnameescape(expand('%:h')).'/'<cr>
+map <leader>ew :e %%
+map <leader>es :sp %%
+map <leader>ev :vsp %%
+map <leader>et :tabe %%
+
+" Adjust viewports to the same size
+map <Leader>= <C-w>=
+
+" Map <Leader>ff to display all lines with keyword under cursor
+" and ask which one to jump to
+nmap <Leader>ff [I:let nr = input("Which one: ")<Bar>exe "normal " . nr ."[\t"<CR>
+
+" Easier horizontal scrolling
+map zl zL
+map zh zH
+
 nnoremap <silent><A-j> :set paste<CR>m`o<Esc>``:set nopaste<CR>
 nnoremap <silent><A-k> :set paste<CR>m`O<Esc>``:set nopaste<CR>
 
 
 
 
-cabbrev so SessionOpen
-cabbrev ss SessionSave
-cabbrev R !python3 %
 
-cabbrev sudo w !sudo tee % " :sudo will save the file with administrative permission
+
+" CtrlP Configuration
+let g:ctrlp_map = '<c-y>'
+let g:ctrlp_cmd = 'CtrlPBuffer'
+let g:ctrlp_working_path_mode = 'ra'
+nnoremap <c-p> :CtrlP <CR>
+
+if executable('ag')
+  " Use Ag over Grep
+  set grepprg=ag\ --nogroup\ --nocolor
+
+  " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
+  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+endif
 
 
 "AirLine Configuration
@@ -142,7 +225,6 @@ let g:airline_theme             = 'powerlineish'
 let g:airline_enable_branch     = 1
 let g:airline_enable_syntastic  = 1
 let g:airline_powerline_fonts = 1
-
 
 
 
@@ -246,3 +328,31 @@ autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 if !exists('g:neocomplete#sources#omni#input_patterns')
   let g:neocomplete#sources#omni#input_patterns = {}
 endif
+
+autocmd BufWritePre * StripWhitespace " Remove trailing whitespace on save
+" Vim
+let g:indentLine_color_term = 239
+
+"GVim
+let g:indentLine_color_gui = '#64656E'
+
+" none X terminal
+let g:indentLine_color_tty_light = 7 " (default: 4)
+let g:indentLine_color_dark = 1 " (default: 2)
+let g:indentLine_char = '¦'
+
+
+let g:pymode_lint_write = 0
+let g:pymode_rope = 0
+let g:pymode_rope_lookup_project = 0
+let g:pymode_rope_complete_on_dot = 0
+
+set nofoldenable    " disable folding
+
+nmap s <Plug>(easymotion-s)
+let g:EasyMotion_smartcase = 1
+map <Leader>j <Plug>(easymotion-j)
+map <Leader>k <Plug>(easymotion-k)
+
+"Syntactic settings
+let g:syntastic_python_python_exec = '/path/to/python3'
