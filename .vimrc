@@ -69,7 +69,7 @@ set guiheadroom=0
 set background=dark
 colorscheme void
 set t_Co=256
-set guifont=Liberation\ Mono\ for\ Powerline\ 12
+set guifont=Liberation\ Mono\ for\ Powerline\ 13
 
 set linespace=0                 " No extra spaces between rows
 
@@ -331,6 +331,7 @@ endif
 
 autocmd BufWritePre * StripWhitespace " Remove trailing whitespace on save
 " Vim
+
 let g:indentLine_color_term = 239
 
 "GVim
@@ -356,3 +357,5 @@ map <Leader>k <Plug>(easymotion-k)
 
 "Syntactic settings
 let g:syntastic_python_python_exec = '/path/to/python3'
+nmap <silent> cp "_cw<C-R>"<Esc>
+
