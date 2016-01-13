@@ -357,5 +357,10 @@ map <Leader>k <Plug>(easymotion-k)
 
 "Syntactic settings
 let g:syntastic_python_python_exec = '/path/to/python3'
-nmap <silent> cp "_cw<C-R>"<Esc>
 
+"This allows for change paste motion cp{motion}
+nmap <silent> cp :set opfunc=ChangePaste<CR>g@
+function! ChangePaste(type, ...)
+    silent exe "normal! `[v`]\"_c"
+    silent exe "normal! p"
+endfunction
